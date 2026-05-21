@@ -17,6 +17,17 @@ function MiniGame() {
     if (universities.length > 0) generateQuestion()
   }, [universities])
 
+  function translateCountry(countryName) {
+    const uni = universities.find(u => u.country === countryName)
+    if (!uni) return countryName
+    try {
+      const regionNames = new Intl.DisplayNames(['sv'], { type: 'region' })
+      return regionNames.of(uni.alpha_two_code) || countryName
+    } catch {
+      return countryName
+    }
+  }
+
   function generateQuestion() {
     setSelected(null)
     const random = universities[Math.floor(Math.random() * universities.length)]
@@ -66,13 +77,17 @@ function MiniGame() {
                 : ''
             }
           >
-            {option}
+            {translateCountry(option)}
           </button>
         ))}
       </div>
       {selected && (
         <div className="result">
-          <p>{selected === question.country ? 'Rätt svar!' : `Fel svar! Det var ${question.country}`}</p>
+          <p>
+            {selected === question.country
+              ? 'Rätt svar!'
+              : `Fel svar! Det var ${translateCountry(question.country)}`}
+          </p>
           <button onClick={generateQuestion}>Nästa fråga</button>
         </div>
       )}
