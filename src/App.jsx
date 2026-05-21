@@ -1,8 +1,9 @@
+import './App.css'
 import MiniGame from './components/MiniGame'
 
 function App() {
   return (
-    <div>
+    <div className="wrapper">
       <MiniGame />
     </div>
   )
