@@ -8,6 +8,9 @@ function MiniGame() {
   const [selected, setSelected] = useState(null)
   const [score, setScore] = useState(0)
   const [round, setRound] = useState(0)
+  const [dogImage, setDogImage] = useState(null)
+  const [dogBreed, setDogBreed] = useState('')
+  const [dogError, setDogError] = useState('')
 
   useEffect(() => {
     setUniversities(data)
@@ -51,6 +54,27 @@ function MiniGame() {
     if (country === question.country) setScore(prev => prev + 1)
   }
 
+  async function fetchDog() {
+    setDogImage(null)
+    setDogBreed('')
+    setDogError('')
+    try {
+      const breedsRes = await fetch('https://dog.ceo/api/breeds/list/all')
+      const breedsData = await breedsRes.json()
+      const breeds = Object.keys(breedsData.message)
+      const randomBreed = breeds[Math.floor(Math.random() * breeds.length)]
+
+      const imageRes = await fetch(`https://dog.ceo/api/breed/${randomBreed}/images/random`)
+      const imageData = await imageRes.json()
+
+      setDogBreed(randomBreed)
+      setDogImage(imageData.message)
+    } catch (error) {
+      setDogError('Kunde inte hämta en hund just nu, försök igen!')
+      console.log('Något gick fel:', error)
+    }
+  }
+
   if (!question) return <p className="loading">Laddar universitet...</p>
 
   return (
@@ -91,6 +115,14 @@ function MiniGame() {
           <button onClick={generateQuestion}>Nästa fråga</button>
         </div>
       )}
+
+      <div className="dog-section">
+        <p>Behöver du en paus? Se en slumpmässig hund!</p>
+        <button onClick={fetchDog}>Visa hund</button>
+        {dogError && <p className="error">{dogError}</p>}
+        {dogBreed && <p className="dog-breed">Ras: <strong>{dogBreed}</strong></p>}
+        {dogImage && <img src={dogImage} alt={dogBreed} className="dog-image" />}
+      </div>
     </div>
   )
 }
